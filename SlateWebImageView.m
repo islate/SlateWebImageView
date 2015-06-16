@@ -1,22 +1,23 @@
 //
 //  SlateWebImageView.m
-//  WebImage
+//  SlateCore
 //
 //  Created by yizelin on 13-7-10.
 //  Copyright (c) 2013年 yizelin. All rights reserved.
 //
 
 #import "SlateWebImageView.h"
-//#import <SDWebImage/SDImageCache.h>
-//#import <SDWebImage/SDWebImageManager.h>
-//#import <SDWebImage/UIImageView+WebCache.h>
-""
-#import <QuartzCore/QuartzCore.h>
 
 #import <AVFoundation/AVFoundation.h>
+#import <objc/runtime.h>
+
+#import "SDImageCache.h"
+#import "SDWebImageManager.h"
+#import "UIImageView+WebCache.h"
+
 #import "PBJVideoPlayerController.h"
 #import "PBJVideoView.h"
-#import <objc/runtime.h>
+
 
 @interface SlateWebImageView ()
 
@@ -500,7 +501,7 @@ static char SlateWebImageViewVoiceButton;
     if (!player) {
         player = [[PBJVideoPlayerController alloc] init];
         player.delegate = self;
-        player.muted = YES; // 默认静音
+//        player.muted = YES; // 默认静音
         [self setPlayer:player];
     }
     
@@ -611,12 +612,13 @@ static char SlateWebImageViewVoiceButton;
 
 - (void)setMuted:(BOOL)muted
 {
-    [self.player setMuted:muted];
+//    [self.player setMuted:muted];
 }
 
 - (BOOL)muted
 {
-    return [self.player muted];
+    return NO;
+//    return [self.player muted];
 }
 
 @end

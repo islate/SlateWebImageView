@@ -1,6 +1,6 @@
 //
 //  SlateWebImageView.h
-//  WebImage
+//  SlateCore
 //
 //  Created by yizelin on 13-7-10.
 //  Copyright (c) 2013年 yizelin. All rights reserved.
