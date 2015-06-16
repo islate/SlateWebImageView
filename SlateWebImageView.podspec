@@ -1,12 +1,9 @@
 Pod::Spec.new do |s|
   s.name             = "SlateWebImageView"
   s.version          = "0.1.0"
-  s.summary          = "A short description of SlateWebImageView."
+  s.summary          = "A extended image view."
   s.description      = <<-DESC
-                       An optional longer description of SlateWebImageView
-
-                       * Markdown format.
-                       * Don't worry about the indent, we strip it!
+			A extended image view. Support image url or video url. 
                        DESC
   s.homepage         = "https://github.com/mmslate/SlateWebImageView"
   s.license          = 'MIT'
