@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "SlateWebImageView"
-  s.version          = "0.1.0"
+  s.version          = "0.1.1"
   s.summary          = "A extended image view."
   s.description      = <<-DESC
 			A extended image view. Support image url or video url. 
@@ -14,4 +14,5 @@ Pod::Spec.new do |s|
   s.source_files = '*.{h,m}'
   s.dependency 'SDWebImage', '~> 3.7.2'
   s.dependency 'PBJVideoPlayer', '~> 0.2.0'
+  s.dependency 'SlateActivityIndicatorView', '~> 0.1.0'
 end

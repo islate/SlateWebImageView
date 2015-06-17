@@ -3,26 +3,36 @@
 //  SlateCore
 //
 //  Created by yizelin on 13-7-10.
-//  Copyright (c) 2013年 yizelin. All rights reserved.
+//  Copyright (c) 2013年 mmslate. All rights reserved.
 //
 
 #import "SlateWebImageView.h"
 
 #import <AVFoundation/AVFoundation.h>
 #import <objc/runtime.h>
-
 #import "SDImageCache.h"
 #import "SDWebImageManager.h"
 #import "UIImageView+WebCache.h"
-
 #import "PBJVideoPlayerController.h"
 #import "PBJVideoView.h"
+#import "SlateActivityIndicatorView.h"
 
+#ifndef DLog
+#  ifdef DEBUG
+#    define DLog(...) NSLog(__VA_ARGS__)
+#  else
+#    define DLog(...) /* */
+#  endif
+#endif
+
+#ifndef ALog
+#  define ALog(...) NSLog(__VA_ARGS__)
+#endif
 
 @interface SlateWebImageView ()
 
 @property (nonatomic, strong) UIImageView   *placeholderView;
-//@property (nonatomic, strong) SlateActivityIndicatorView   *activityIndicatorView;
+@property (nonatomic, strong) SlateActivityIndicatorView   *activityIndicatorView;
 
 // video
 @property (nonatomic, assign) BOOL autoplay;
@@ -134,7 +144,6 @@ static char SlateWebImageViewVoiceButton;
     
     if (useActivityIndicator)
     {
-        /*
         if (self.activityIndicatorView == nil)
         {
             self.activityIndicatorView = [[SlateActivityIndicatorView alloc] initWithFrame:self.bounds];
@@ -143,8 +152,6 @@ static char SlateWebImageViewVoiceButton;
             [self.activityIndicatorView startAnimating];
             [self insertSubview:self.activityIndicatorView belowSubview:self.imageView];
         }
-        */
-        
         if (self.placeholderView)
         {
             [self.placeholderView removeFromSuperview];
@@ -164,13 +171,11 @@ static char SlateWebImageViewVoiceButton;
             
             [self updatePlaceholder];
         }
-        
-        /*
         if (self.activityIndicatorView)
         {
             [self.activityIndicatorView removeFromSuperview];
             self.activityIndicatorView = nil;
-        }*/
+        }
     }
 }
 
@@ -178,7 +183,7 @@ static char SlateWebImageViewVoiceButton;
 {
     [super setFrame:frame];
     
-    //self.activityIndicatorView.center = CGPointMake(frame.size.width / 2.0, frame.size.height / 2.0);
+    self.activityIndicatorView.center = CGPointMake(frame.size.width / 2.0, frame.size.height / 2.0);
     
     [self updatePlaceholder];
 }
@@ -193,7 +198,7 @@ static char SlateWebImageViewVoiceButton;
     self.imageView.image = image;
     
     if (image) {
-        //[self.activityIndicatorView stopAnimating];
+        [self.activityIndicatorView stopAnimating];
         self.placeholderView.hidden = YES;
     }
 }
@@ -223,7 +228,7 @@ static char SlateWebImageViewVoiceButton;
         [self.imageView sd_cancelCurrentImageLoad];
         self.placeholderView.image = [self placeHolderWithFrame:self.bounds];
         self.placeholderView.hidden = NO;
-        //[self.activityIndicatorView startAnimating];
+        [self.activityIndicatorView startAnimating];
         self.imageView.image = nil;
         self.url = nil;
         [self updatePlaceholder];
@@ -263,7 +268,7 @@ static char SlateWebImageViewVoiceButton;
     self.imageView.image = nil;
     self.placeholderView.image = [self placeHolderWithFrame:self.bounds];
     self.placeholderView.hidden = NO;
-    //[self.activityIndicatorView startAnimating];
+    [self.activityIndicatorView startAnimating];
     [self updatePlaceholder];
 
     [self.imageView sd_setImageWithURL:url
@@ -291,7 +296,7 @@ static char SlateWebImageViewVoiceButton;
                               {
                                   weakSelf.url = url.absoluteString;
                                   weakSelf.placeholderView.hidden = YES;
-                                  //[weakSelf.activityIndicatorView stopAnimating];
+                                  [weakSelf.activityIndicatorView stopAnimating];
                                   
                                   if (!weakSelf.progressiveDownload && weakSelf.fadeIn)
                                   {
@@ -316,7 +321,7 @@ static char SlateWebImageViewVoiceButton;
     if (self.imageView.image)
     {
         self.placeholderView.hidden = YES;
-        //[self.activityIndicatorView stopAnimating];
+        [self.activityIndicatorView stopAnimating];
         if (!self.progressiveDownload && self.fadeIn)
         {
             [self.layer removeAllAnimations];
@@ -402,9 +407,11 @@ static char SlateWebImageViewVoiceButton;
     [[SDWebImageManager sharedManager] downloadImageWithURL:url
                                                options:options
                                               progress:nil
-                                             completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
-                                                 if (completedBlock) {
-                                                     completedBlock(image, error);
+                                             completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL)
+                                             {
+                                                 if (completedBlock)
+                                                 {
+                                                     completedBlock(image, error,imageURL);
                                                  }
                                               }];
 }
@@ -428,7 +435,7 @@ static char SlateWebImageViewVoiceButton;
         __weak typeof(self) weakSelf = self;
         [SlateWebImageView downloadImageWithURL:imageURL
                                    highPriority:YES
-                                      completed:^(UIImage *image, NSError *error) {
+                                      completed:^(UIImage *image, NSError *error , NSURL *imageUrl) {
                                           if (image && !error)
                                           {
                                               weakSelf.image = image;
@@ -456,7 +463,7 @@ static char SlateWebImageViewVoiceButton;
         __weak typeof(self) weakSelf = self;
         [SlateWebImageView downloadImageWithURL:imageURL
                                    highPriority:YES
-                                      completed:^(UIImage *image, NSError *error) {
+                                      completed:^(UIImage *image, NSError *error , NSURL *imageUrl) {
                                           if (image && !error)
                                           {
                                               [weakSelf setImage:image forState:state];
@@ -481,7 +488,7 @@ static char SlateWebImageViewVoiceButton;
         __weak typeof(self) weakSelf = self;
         [SlateWebImageView downloadImageWithURL:imageURL
                                    highPriority:YES
-                                      completed:^(UIImage *image, NSError *error) {
+                                      completed:^(UIImage *image, NSError *error , NSURL *imageUrl) {
                                           if (image && !error)
                                           {
                                               [weakSelf setBackgroundImage:image forState:state];
@@ -515,6 +522,8 @@ static char SlateWebImageViewVoiceButton;
 
 - (void)setVideoWithURL:(NSURL *)videoURL coverImageURL:(NSURL *)coverImageURL
 {
+    ALog(@"SlateWebImageView setVideoWithURL:%@", videoURL);
+    
     self.videoURL = videoURL;
     
     __weak typeof(self) weakSelf = self;
@@ -544,15 +553,20 @@ static char SlateWebImageViewVoiceButton;
 
 - (void)play
 {
+    if (self.autoplay) {
+        return;
+    }
+    
     self.autoplay = YES;
     
     if (self.videoURL) {
-        //if (!self.player) {
+        if (!self.player) {
             [self preparePlayer];
-        //}
+        }
         
         if (self.player) {
-
+            ALog(@"SlateWebImageView(%@) play", self.videoURL.lastPathComponent);
+            
             [self.player playFromBeginning];
             
             if (self.player.bufferingState != PBJVideoPlayerBufferingStateUnknown) {
@@ -567,7 +581,7 @@ static char SlateWebImageViewVoiceButton;
     self.autoplay = NO;
     
     if (self.videoURL && self.player) {
-        //ALog(@"SlateWebImageView(%@) stop", self.videoURL.lastPathComponent);
+        ALog(@"SlateWebImageView(%@) stop", self.videoURL.lastPathComponent);
         [self.player stop];
         [self.player.view removeFromSuperview];
         self.voiceButton.hidden = YES;
@@ -576,6 +590,10 @@ static char SlateWebImageViewVoiceButton;
 
 - (void)resume
 {
+    if (self.autoplay) {
+        return;
+    }
+    
     self.autoplay = YES;
     
     if (self.videoURL) {
@@ -584,7 +602,7 @@ static char SlateWebImageViewVoiceButton;
         }
         
         if (self.player) {
-            //ALog(@"SlateWebImageView(%@) resume", self.videoURL.lastPathComponent);
+            ALog(@"SlateWebImageView(%@) resume", self.videoURL.lastPathComponent);
             
             [self.player playFromCurrentTime];
             
@@ -600,7 +618,7 @@ static char SlateWebImageViewVoiceButton;
     self.autoplay = NO;
     
     if (self.videoURL && self.player) {
-        //ALog(@"SlateWebImageView(%@) pause", self.videoURL.lastPathComponent);
+        ALog(@"SlateWebImageView(%@) pause", self.videoURL.lastPathComponent);
         [self.player pause];
     }
 }
@@ -656,14 +674,14 @@ static char SlateWebImageViewVoiceButton;
         [self addSubview:self.player.view];
         self.voiceButton.hidden = NO;
         
-        //ALog(@"SlateWebImageView(%@) showVideoPlayer", self.videoURL.lastPathComponent);
+        ALog(@"SlateWebImageView(%@) showVideoPlayer", self.videoURL.lastPathComponent);
     }
 }
 
 - (void)removeVideoPlayer
 {
     if (self.player) {
-        //ALog(@"SlateWebImageView(%@) removeVideoPlayer", self.videoURL.lastPathComponent);
+        ALog(@"SlateWebImageView(%@) removeVideoPlayer", self.videoURL.lastPathComponent);
         
         self.player.delegate = nil;
         [self.player stop];
@@ -679,10 +697,10 @@ static char SlateWebImageViewVoiceButton;
 
 - (void)videoPlayerReady:(PBJVideoPlayerController *)videoPlayer
 {
-    //ALog(@"SlateWebImageView(%@) videoPlayerReady. Max duration of the video: %f", self.videoURL.lastPathComponent, videoPlayer.maxDuration);
+    ALog(@"SlateWebImageView(%@) videoPlayerReady. Max duration of the video: %f", self.videoURL.lastPathComponent, videoPlayer.maxDuration);
     
     if (self.autoplay) {
-        //ALog(@"SlateWebImageView(%@) autoplay ready", self.videoURL.lastPathComponent);
+        ALog(@"SlateWebImageView(%@) autoplay ready", self.videoURL.lastPathComponent);
         [self.player playFromBeginning];
         [self showVideoPlayer];
     }
@@ -696,24 +714,24 @@ static char SlateWebImageViewVoiceButton;
 {
     switch (videoPlayer.bufferingState) {
         case PBJVideoPlayerBufferingStateUnknown:
-            //ALog(@"Buffering state unknown!");
+            ALog(@"Buffering state unknown!");
             break;
             
         case PBJVideoPlayerBufferingStateReady:
-            //ALog(@"Buffering state Ready! Video will start/ready playing now.");
+            ALog(@"Buffering state Ready! Video will start/ready playing now.");
             
             if (self.autoplay) {
-                //ALog(@"SlateWebImageView(%@) autoplay buffer ready", self.videoURL.lastPathComponent);
+                ALog(@"SlateWebImageView(%@) autoplay buffer ready", self.videoURL.lastPathComponent);
                 [self.player playFromCurrentTime];
                 [self showVideoPlayer];
             }
             break;
             
         case PBJVideoPlayerBufferingStateDelayed:
-            //ALog(@"Buffering state Delayed! Video will pause/stop playing now.");
+            ALog(@"Buffering state Delayed! Video will pause/stop playing now.");
             
             if (self.autoplay) {
-               // ALog(@"SlateWebImageView(%@) autoplay buffer delayed", self.videoURL.lastPathComponent);
+                ALog(@"SlateWebImageView(%@) autoplay buffer delayed", self.videoURL.lastPathComponent);
                 [self.player playFromCurrentTime];
                 [self showVideoPlayer];
             }

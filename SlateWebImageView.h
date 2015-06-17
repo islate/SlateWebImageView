@@ -3,7 +3,7 @@
 //  SlateCore
 //
 //  Created by yizelin on 13-7-10.
-//  Copyright (c) 2013年 yizelin. All rights reserved.
+//  Copyright (c) 2013年 mmslate. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -45,7 +45,7 @@
 
 @end
 
-typedef void(^SlateWebImageViewCompletedBlock)(UIImage *image, NSError *error);
+typedef void(^SlateWebImageViewCompletedBlock)(UIImage *image, NSError *error, NSURL *url);
 
 @interface SlateWebImageView (cacheAndDownload)
 
